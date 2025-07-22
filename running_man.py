@@ -11,29 +11,29 @@ GROUND_HEIGHT = PLAYER_HEIGHT = 375
 
 # Classes
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         player_walk_1 = pygame.image.load(abs_path / "graphics" / "player" / "alienPink_walk1.png").convert_alpha()
         player_walk_2 = pygame.image.load(abs_path / "graphics" / "player" / "alienPink_walk2.png").convert_alpha()
         self.player_jump = pygame.image.load(abs_path / "graphics" / "player" / "alienPink_jump.png").convert_alpha()
         self.player_walk = [player_walk_1, player_walk_2]
-        self.player_index = 0
+        self.player_index = 0.0
         self.gravity = 0
 
-        self.image = self.player_walk[self.player_index]
+        self.image = self.player_walk[int(self.player_index)]
         self.rect = self.image.get_rect(midbottom = (125, PLAYER_HEIGHT))
 
-    def check_input(self):
+    def check_input(self) -> None:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= PLAYER_HEIGHT:
             self.gravity = -18
 
-    def apply_gravity(self):
+    def apply_gravity(self) -> None:
         self.gravity += 1
         self.rect.y += self.gravity
         if self.rect.bottom >= PLAYER_HEIGHT: self.rect.bottom = PLAYER_HEIGHT
 
-    def animate(self):
+    def animate(self) -> None:
         if self.rect.bottom < PLAYER_HEIGHT:
             # Jump
             self.image = self.player_jump
@@ -44,13 +44,13 @@ class Player(pygame.sprite.Sprite):
             if self.player_index >= len(self.player_walk): self.player_index = 0
             self.image = self.player_walk[int(self.player_index)]
     
-    def update(self):
+    def update(self) -> None:
         self.animate()
         self.check_input()
         self.apply_gravity()
 
 
-def display_score():
+def display_score() -> int:
     # Score
     time = int((pygame.time.get_ticks() - start_time) / 1000)
     surf = font.render(f"Score: {time}", False, (255, 255, 255))
@@ -63,7 +63,7 @@ def display_score():
 
     return time
 
-def draw_background(sky, ground, ground_scroll, sky_scroll):
+def draw_background(sky, ground, ground_scroll: int, sky_scroll: int) -> tuple[int, int]:
     for i in range(0, tiles):
         screen.blit(sky, (i * sky.get_width() + sky_scroll, 0))
 
