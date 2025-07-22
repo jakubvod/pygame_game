@@ -42,10 +42,16 @@ class Player(pygame.sprite.Sprite):
 
 
 def display_score():
+    # Score
     time = int((pygame.time.get_ticks() - start_time) / 1000)
     surf = font.render(f"Score: {time}", False, (0, 0, 0))
     rect = surf.get_rect(center = (350, 50))
     screen.blit(surf, rect)
+
+    # Outline
+    outline = rect.inflate(15, 15)
+    pygame.draw.rect(screen, (0, 0, 0), outline, 3)
+
     return time
 
 
