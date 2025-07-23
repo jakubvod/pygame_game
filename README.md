@@ -1,4 +1,4 @@
-# Running Man (pygame_game)
+# Alien Run (2D endless runner)
 
 My first game, heavily inspired by [this video](https://www.youtube.com/watch?v=AY9MnQ4x3zk).
 
