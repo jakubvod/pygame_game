@@ -92,7 +92,7 @@ def display_score() -> int:
     # Score
     time = int((pygame.time.get_ticks() - start_time) / 1000)
     surf = font.render(f"Score: {time}", False, (255, 255, 255))
-    rect = surf.get_rect(center = (SCREEN_WIDTH / 2, 50))
+    rect = surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT * 0.09))
     screen.blit(surf, rect)
 
     # Outline
@@ -130,27 +130,37 @@ def draw_background(sky, ground, ground_scroll: int, sky_scroll: int) -> tuple[i
 
 def draw_intro() -> None:
     alien_intro = pygame.transform.rotozoom((pygame.image.load(abs_path / "graphics" / "player" / "alienPink.png").convert_alpha()), 0, 2)
-    alien_intro_rect = alien_intro.get_rect(center = (SCREEN_WIDTH / 2, 240))
+    alien_intro_rect = alien_intro.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT * 0.44))
 
     intro_font = font_big.render(f"Alien Run", False, (255, 255, 255))
-    intro_font_rec = intro_font.get_rect(center = (SCREEN_WIDTH / 2, 365))
+    intro_font_rec = intro_font.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT * 0.68))
 
     intro_font_2 = font.render(f"Press SPACE to start", False, (255, 255, 255))
-    intro_font_2_rec = intro_font_2.get_rect(center = (SCREEN_WIDTH / 2, 400))
+    intro_font_2_rec = intro_font_2.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT * 0.74))
 
     screen.blit(alien_intro, alien_intro_rect)
     screen.blit(intro_font, intro_font_rec)
     screen.blit(intro_font_2, intro_font_2_rec)
 
 def draw_death(highscore: int) -> None:
+    game_over = font_big.render("GAME OVER", False, (255, 255, 255))
+    game_over_rect = game_over.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT * 0.4))
+
     result = font.render(f"Your score: {score}", False, (255, 255, 255))
     result_rect = result.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
 
     highscore = font.render(f"Highscore: {highscore}", False, (255, 255, 255))
-    highscore_rect = highscore.get_rect(center = (SCREEN_WIDTH / 2, 300))
+    highscore_rect = highscore.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT * 0.55))
 
+    restart = font_big.render("PRESS SPACE TO RESTART", False, (255, 255, 255))
+    restart_rect = restart.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT * 0.9))
+
+    screen.blit(game_over, game_over_rect)
     screen.blit(result, result_rect)
     screen.blit(highscore, highscore_rect)
+    screen.blit(restart, restart_rect)
+    outline = restart_rect.inflate(15, 15)
+    pygame.draw.rect(screen, (255, 255, 255), outline, 3)
 
 
 # Initialization
@@ -229,8 +239,6 @@ while True:
                 highscore = score
                 save_highscore(highscore)
             draw_death(highscore)
-            
-
 
     pygame.display.update()
     clock.tick(FPS)
