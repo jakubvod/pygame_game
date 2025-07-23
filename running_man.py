@@ -1,7 +1,7 @@
 from pathlib import Path
 import pygame
 import math
-from random import randint
+from random import randint, choice
 
 # Constants
 FPS = 60
@@ -23,9 +23,9 @@ class Player(pygame.sprite.Sprite):
         self.image = self.player_walk[int(self.player_index)]
         self.rect = self.image.get_rect(midbottom = (125, PLAYER_HEIGHT))
 
-    def check_input(self) -> None:
+    def check_input(self, game_active: bool) -> None:
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] and self.rect.bottom >= PLAYER_HEIGHT:
+        if game_active and keys[pygame.K_SPACE] and self.rect.bottom >= PLAYER_HEIGHT:
             self.gravity = -18
 
     def apply_gravity(self) -> None:
@@ -44,11 +44,48 @@ class Player(pygame.sprite.Sprite):
             if self.player_index >= len(self.player_walk): self.player_index = 0
             self.image = self.player_walk[int(self.player_index)]
     
-    def update(self) -> None:
+    def update(self, game_active: bool) -> None:
         self.animate()
-        self.check_input()
+        self.check_input(game_active)
         self.apply_gravity()
 
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self, name: str) -> None:
+        super().__init__()
+        self.animation_index = 0.0
+        self.animations: list[pygame.Surface] = []
+
+        if name == "spider":
+            self.animations.append(pygame.image.load(abs_path / "graphics" / "obstacles" / "spider_walk1.png").convert_alpha())
+            self.animations.append(pygame.image.load(abs_path / "graphics" / "obstacles" / "spider_walk2.png").convert_alpha())
+            self.image = self.animations[int(self.animation_index)]
+            self.rect = self.image.get_rect(midbottom = (randint(1000,1400), PLAYER_HEIGHT))
+
+        else: # fly
+            self.animations.append(pygame.image.load(abs_path / "graphics" / "obstacles" / "fly.png").convert_alpha())
+            self.animations.append(pygame.image.load(abs_path / "graphics" / "obstacles" / "fly_fly.png").convert_alpha())
+            self.image = self.animations[int(self.animation_index)]
+            self.rect = self.image.get_rect(midbottom = (randint(1000,1400), 250))
+    
+    def animate(self) -> None:
+        self.animation_index += 0.1
+        if self.animation_index >= len(self.animations): self.animation_index = 0
+        self.image = self.animations[int(self.animation_index)]
+    
+    def destroy(self) -> None:
+        if self.rect.right <= 0:
+            self.kill()
+
+    def update(self) -> None:
+        self.animate()
+        self.rect.x -= 6
+        self.destroy()
+
+def collision() -> bool:
+    if pygame.sprite.spritecollide(player.sprite, obstacle_group, False):
+        obstacle_group.empty()
+        return True
+    return False
 
 def display_score() -> int:
     # Score
@@ -106,8 +143,11 @@ sky_scroll = 0
 # Groups
 player = pygame.sprite.GroupSingle()
 player.add(Player())
+obstacle_group = pygame.sprite.Group()
 
-enemies = pygame.sprite.Group()
+# Obstacle timer
+obstacle_timer = pygame.USEREVENT + 1
+pygame.time.set_timer(obstacle_timer,1700)
 
 
 while True:
@@ -115,17 +155,41 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-
+        
+        if game_active:
+            if event.type == obstacle_timer:
+                obstacle_group.add(Obstacle(choice(["spider", "spider", "fly"])))
+        else:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_f:
+                game_active = True
+                start_time = pygame.time.get_ticks() # Reset timer after death
     
     if game_active:
         # Scroll background 
         ground_scroll, sky_scroll = draw_background(sky_background, ground, ground_scroll, sky_scroll)
 
         player.draw(screen)
-        player.update()
+
+        obstacle_group.draw(screen)
+        obstacle_group.update()
+
         score = display_score()
+
+        if collision():
+            game_active = False
+        
+        player.update(game_active)
+
     else:
-        pass
+        screen.fill((0, 255, 255))
+
+        if score == 0:  # Intro screen
+            pass
+
+        else: # Death screen
+            result = font.render(f"Your score: {score} (PRESS F TO RESTART)", False, (0, 0, 0))
+            result_rect = result.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+            screen.blit(result, result_rect)
 
 
     pygame.display.update()
