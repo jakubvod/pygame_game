@@ -9,12 +9,14 @@ A simple 2D endless runner built in Python.
 - "Intro/Game Over" screen
 - Score + Highscore
 - Simple gravity physics
+- Coin pickups
+- Sound effects + background music
+- Game gets faster over time
 
 ## 🚧 Planned
 
-- Pickups / Power-ups (e.g. shields or bonus points)
-- Sound effects & background music
-- Difficulty scaling
+- More pickups / Power-ups (e.g. shields or bonus points)
+- Better difficulty scaling
 
 ## 💡 Inspiration
 
