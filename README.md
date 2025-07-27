@@ -15,7 +15,7 @@ A simple 2D endless runner built in Python.
 
 ## 🚧 Planned
 
-- More pickups / Power-ups (e.g. shields or bonus points)
+- More pickups / Power-ups (e.g. shields)
 - Better difficulty scaling
 
 ## 💡 Inspiration
