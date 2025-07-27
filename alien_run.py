@@ -27,7 +27,7 @@ class Player(pygame.sprite.Sprite):
     def check_input(self) -> None:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= PLAYER_HEIGHT:
-            self.gravity = -18
+            self.gravity = -20
 
     def apply_gravity(self) -> None:
         self.gravity += 1
@@ -82,15 +82,55 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect.x -= 6
         self.destroy()
 
-def collision() -> bool:
+
+class Pickup(pygame.sprite.Sprite):
+    def __init__(self, name: str) -> None:
+        super().__init__()
+        self.animation_index = 0.0
+        self.animations: list[pygame.Surface] = []
+
+        if name == "coin":
+            self.type: str = "coin"
+            self.animations.append(pygame.transform.rotozoom(pygame.image.load(abs_path / "graphics" / "pickups" / "coin" / "silver_1.png").convert_alpha(), 0, 0.5))
+            self.animations.append(pygame.transform.rotozoom(pygame.image.load(abs_path / "graphics" / "pickups" / "coin" / "silver_2.png").convert_alpha(), 0, 0.5))
+            self.animations.append(pygame.transform.rotozoom(pygame.image.load(abs_path / "graphics" / "pickups" / "coin" / "silver_3.png").convert_alpha(), 0, 0.5))
+            self.animations.append(pygame.transform.rotozoom(pygame.image.load(abs_path / "graphics" / "pickups" / "coin" / "silver_4.png").convert_alpha(), 0, 0.5))
+            self.animations.append(pygame.transform.rotozoom(pygame.image.load(abs_path / "graphics" / "pickups" / "coin" / "silver_5.png").convert_alpha(), 0, 0.5))
+            self.animations.append(pygame.transform.rotozoom(pygame.image.load(abs_path / "graphics" / "pickups" / "coin" / "silver_6.png").convert_alpha(), 0, 0.5))
+            self.image = self.animations[int(self.animation_index)]
+            self.rect = self.image.get_rect(midbottom = (randint(1600, 3000), randint(PLAYER_HEIGHT - 18, PLAYER_HEIGHT - 4)))
+
+    def animate(self) -> None:
+        self.animation_index += 0.15
+        if self.animation_index >= len(self.animations): self.animation_index = 0
+        self.image = self.animations[int(self.animation_index)] 
+
+    def destroy(self) -> None:
+        if self.rect.right <= 0:
+            self.kill()
+    
+    def update(self) -> None:
+        self.animate()
+        self.rect.x -= 5
+        self.destroy()
+
+
+
+def collision(coin_score: int) -> bool:
     if pygame.sprite.spritecollide(player.sprite, obstacle_group, False):
         obstacle_group.empty()
-        return True
-    return False
+        pickup_group.empty()
+        return False, coin_score
+    
+    for pickup in pygame.sprite.spritecollide(player.sprite, pickup_group, True):
+        if pickup.type == "coin":
+            coin_score += 5
 
-def display_score() -> int:
+    return True, coin_score
+
+def display_score(coin_score: int) -> int:
     # Score
-    time = int((pygame.time.get_ticks() - start_time) / 1000)
+    time = int((pygame.time.get_ticks() - start_time) / 1000) + coin_score
     surf = font.render(f"Score: {time}", False, (255, 255, 255))
     rect = surf.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT * 0.09))
     screen.blit(surf, rect)
@@ -172,6 +212,7 @@ clock = pygame.time.Clock()
 game_active = False
 start_time = 0
 score = 0
+coin_score = 0 # One coin collected equals +5 score
 highscore = load_highscore()
 
 # Font
@@ -191,10 +232,13 @@ sky_scroll = 0
 player = pygame.sprite.GroupSingle()
 player.add(Player())
 obstacle_group = pygame.sprite.Group()
+pickup_group = pygame.sprite.Group()
 
-# Obstacle timer
+# Timers
 obstacle_timer = pygame.USEREVENT + 1
 pygame.time.set_timer(obstacle_timer,1700)
+pickup_timer = pygame.USEREVENT + 2
+pygame.time.set_timer(pickup_timer, 5000)
 
 
 while True:
@@ -206,6 +250,8 @@ while True:
         if game_active:
             if event.type == obstacle_timer:
                 obstacle_group.add(Obstacle(choice(["spider", "spider", "fly"])))
+            if event.type == pickup_timer:
+                pickup_group.add(Pickup(choice(["coin"]) ))
         else:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 game_active = True
@@ -221,10 +267,11 @@ while True:
         obstacle_group.draw(screen)
         obstacle_group.update()
 
-        score = display_score()
+        pickup_group.draw(screen)
+        pickup_group.update()
 
-        if collision():
-            game_active = False
+        game_active, coin_score = collision(coin_score)
+        score = display_score(coin_score)
         
         
 
