@@ -32,3 +32,12 @@ All game assets, sounds, and fonts used in this project are licensed under **CC0
 - [Joystix Font](https://www.1001fonts.com/joystix-font.html)
 - [Background Music](https://not-jam.itch.io/not-jam-music-pack)
 - [Game Over Sound Effect](https://opengameart.org/content/game-over-soundold-school)
+
+## 🖼️ Images
+
+<img width="950" height="540" alt="Image" src="https://github.com/user-attachments/assets/ec4d6f4d-e600-4daa-b764-8aaf2860aae1" />
+<img width="950" height="540" alt="Image" src="https://github.com/user-attachments/assets/551f1485-c7c3-4434-b012-5238e54652df" />
+<img width="950" height="540" alt="Image" src="https://github.com/user-attachments/assets/c0352877-de66-4fbc-b226-d0aaed5e802d" />
+
+
+
