@@ -79,7 +79,7 @@ class Obstacle(pygame.sprite.Sprite):
 
     def update(self) -> None:
         self.animate()
-        self.rect.x -= 6
+        self.rect.x -= (game_speed + 5)
         self.destroy()
 
 
@@ -111,9 +111,8 @@ class Pickup(pygame.sprite.Sprite):
     
     def update(self) -> None:
         self.animate()
-        self.rect.x -= 5
+        self.rect.x -= (game_speed + 3)
         self.destroy()
-
 
 
 def collision(coin_score: int) -> bool:
@@ -127,6 +126,15 @@ def collision(coin_score: int) -> bool:
             coin_score += 5
 
     return True, coin_score
+
+def update_speed(game_speed: int, speed_update: int, obstacle_timer, obstacle_timer_speed: int, obstacle_timer_offset: int, score: int) -> tuple[int, int, int, int]:
+    if (score // 10 > speed_update and game_speed <= 10):
+        game_speed += 0.5
+        speed_update = score // 10
+        obstacle_timer_offset -= 100
+        pygame.time.set_timer(obstacle_timer, obstacle_timer_speed + obstacle_timer_offset)
+    
+    return game_speed, speed_update, obstacle_timer_speed, obstacle_timer_offset
 
 def display_score(coin_score: int) -> int:
     # Score
@@ -150,7 +158,7 @@ def save_highscore(score: int) -> None:
     with open(abs_path / "highscore.json", "w") as file:
         json.dump({"highscore": score}, file)
 
-def draw_background(sky, ground, ground_scroll: int, sky_scroll: int) -> tuple[int, int]:
+def draw_background(game_speed: int, sky, ground, ground_scroll: int, sky_scroll: int) -> tuple[int, int]:
     for i in range(0, tiles):
         screen.blit(sky, (i * sky.get_width() + sky_scroll, 0))
 
@@ -158,15 +166,15 @@ def draw_background(sky, ground, ground_scroll: int, sky_scroll: int) -> tuple[i
         # Draw scrolling ground
         screen.blit(ground, (i * ground.get_width() + ground_scroll, GROUND_HEIGHT))
     
-    sky_scroll -= 2
-    ground_scroll -= 5
+    sky_scroll -= (game_speed + 1)
+    ground_scroll -= (game_speed + 4)
 
     # Reset scroll
     if abs(ground_scroll) > ground.get_width():
         ground_scroll = 0
     if abs(sky_scroll) > sky.get_width():
         sky_scroll = 0
-    return ground_scroll, sky_scroll
+    return game_speed, ground_scroll, sky_scroll
 
 def draw_intro() -> None:
     alien_intro = pygame.transform.rotozoom((pygame.image.load(abs_path / "graphics" / "player" / "alienPink.png").convert_alpha()), 0, 2)
@@ -214,6 +222,8 @@ start_time = 0
 score = 0
 coin_score = 0 # One coin collected equals +5 score
 highscore = load_highscore()
+game_speed = 1
+speed_update = 0
 
 # Font
 font = pygame.font.Font(abs_path / "font" / "joystix_monospace.otf", 20)
@@ -236,7 +246,10 @@ pickup_group = pygame.sprite.Group()
 
 # Timers
 obstacle_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(obstacle_timer,1700)
+obstacle_timer_speed = 1700
+obstacle_timer_offset = 0
+pygame.time.set_timer(obstacle_timer, obstacle_timer_speed + obstacle_timer_offset)
+
 pickup_timer = pygame.USEREVENT + 2
 pygame.time.set_timer(pickup_timer, 5000)
 
@@ -259,7 +272,8 @@ while True:
     
     if game_active:
         # Scroll background 
-        ground_scroll, sky_scroll = draw_background(sky_background, ground, ground_scroll, sky_scroll)
+        game_speed, ground_scroll, sky_scroll = draw_background(game_speed, sky_background, ground, ground_scroll, sky_scroll)
+        game_speed, speed_update, obstacle_timer_speed, obstacle_timer_offset = update_speed(game_speed, speed_update, obstacle_timer, obstacle_timer_speed, obstacle_timer_offset, score)
 
         player.draw(screen)
         player.update()
@@ -272,10 +286,13 @@ while True:
 
         game_active, coin_score = collision(coin_score)
         score = display_score(coin_score)
-        
-        
-
     else:
+        # Reset speed + score
+        coin_score = 0
+        game_speed = 1
+        speed_update = 0
+        obstacle_timer_offset = 0
+        
         screen.fill((0, 51, 102))
 
         if score == 0:  # Intro screen
