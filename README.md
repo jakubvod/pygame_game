@@ -22,9 +22,11 @@ My first game, heavily inspired by [this video](https://www.youtube.com/watch?v=
 
 ## 📚 Assets and licensing
 
-All game assets and fonts used in this project are licensed under **CC0(Public Domain)**.
+All game assets, sounds, and fonts used in this project are licensed under **CC0(Public Domain)**.
 
 - [Kenney.nl](https://kenney.nl/)
 - [Platformer Art - Pixel Edition](https://opengameart.org/content/platformer-art-pixel-edition)
 - [Star Field Background](https://opengameart.org/content/star-field)
 - [Joystix Font](https://www.1001fonts.com/joystix-font.html)
+- [Background Music](https://not-jam.itch.io/not-jam-music-pack)
+- [Game Over Sound Effect](https://opengameart.org/content/game-over-soundold-school)

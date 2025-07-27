@@ -24,10 +24,14 @@ class Player(pygame.sprite.Sprite):
         self.image = self.player_walk[int(self.player_index)]
         self.rect = self.image.get_rect(midbottom = (125, PLAYER_HEIGHT))
 
+        self.jump_sound = pygame.mixer.Sound(abs_path / "audio" / "jump.mp3")
+        self.jump_sound.set_volume(0.3)
+
     def check_input(self) -> None:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= PLAYER_HEIGHT:
             self.gravity = -20
+            self.jump_sound.play()
 
     def apply_gravity(self) -> None:
         self.gravity += 1
@@ -115,14 +119,17 @@ class Pickup(pygame.sprite.Sprite):
         self.destroy()
 
 
-def collision(coin_score: int) -> bool:
+def collision(coin_score: int, death_sound) -> bool:
     if pygame.sprite.spritecollide(player.sprite, obstacle_group, False):
         obstacle_group.empty()
         pickup_group.empty()
+        death_sound.play()
         return False, coin_score
     
     for pickup in pygame.sprite.spritecollide(player.sprite, pickup_group, True):
         if pickup.type == "coin":
+            coin_pickup_sound = pygame.mixer.Sound(abs_path / "audio" / "coin.mp3")
+            coin_pickup_sound.play()
             coin_score += 5
 
     return True, coin_score
@@ -225,6 +232,11 @@ highscore = load_highscore()
 game_speed = 1
 speed_update = 0
 
+bg_start_music = pygame.mixer.Sound(abs_path / "audio" / "menu.wav")
+bg_start_music.play()
+bg_play_music = pygame.mixer.Sound(abs_path / "audio" / "run.wav")
+death_sound = pygame.mixer.Sound(abs_path / "audio" / "GameOver.wav")
+
 # Font
 font = pygame.font.Font(abs_path / "font" / "joystix_monospace.otf", 20)
 font_big = pygame.font.Font(abs_path / "font" / "joystix_monospace.otf", 40)
@@ -267,10 +279,13 @@ while True:
                 pickup_group.add(Pickup(choice(["coin"]) ))
         else:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                bg_play_music.play()
                 game_active = True
                 start_time = pygame.time.get_ticks() # Reset timer after death
     
     if game_active:
+        bg_start_music.stop()
+
         # Scroll background 
         game_speed, ground_scroll, sky_scroll = draw_background(game_speed, sky_background, ground, ground_scroll, sky_scroll)
         game_speed, speed_update, obstacle_timer_speed, obstacle_timer_offset = update_speed(game_speed, speed_update, obstacle_timer, obstacle_timer_speed, obstacle_timer_offset, score)
@@ -284,9 +299,11 @@ while True:
         pickup_group.draw(screen)
         pickup_group.update()
 
-        game_active, coin_score = collision(coin_score)
+        game_active, coin_score = collision(coin_score, death_sound)
         score = display_score(coin_score)
     else:
+        bg_play_music.stop()
+
         # Reset speed + score
         coin_score = 0
         game_speed = 1
