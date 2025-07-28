@@ -258,7 +258,7 @@ pickup_group = pygame.sprite.Group()
 
 # Timers
 obstacle_timer = pygame.USEREVENT + 1
-obstacle_timer_speed = 1850
+obstacle_timer_speed = 1900
 obstacle_timer_offset = 0
 pygame.time.set_timer(obstacle_timer, obstacle_timer_speed + obstacle_timer_offset)
 
