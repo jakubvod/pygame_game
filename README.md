@@ -4,8 +4,9 @@ A simple 2D endless runner built in Python.
 
 ## ✅ How to play
 1. Download the ZIP and extract it.
-2. Run `pip install -r requirements.txt` (Make sure you have [Python](https://www.python.org/) installed)
-3. Run the game with: `python alien_run.py`
+2. Open the main folder.
+3. Run `pip install -r requirements.txt` (Make sure you have [Python](https://www.python.org/) installed).
+4. Run the game with: `python alien_run.py`.
 
 ## 🛠️ Functions
 
