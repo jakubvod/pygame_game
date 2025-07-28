@@ -102,7 +102,7 @@ class Pickup(pygame.sprite.Sprite):
             self.animations.append(pygame.transform.rotozoom(pygame.image.load(abs_path / "graphics" / "pickups" / "coin" / "silver_5.png").convert_alpha(), 0, 0.5))
             self.animations.append(pygame.transform.rotozoom(pygame.image.load(abs_path / "graphics" / "pickups" / "coin" / "silver_6.png").convert_alpha(), 0, 0.5))
             self.image = self.animations[int(self.animation_index)]
-            self.rect = self.image.get_rect(midbottom = (randint(1600, 3000), randint(PLAYER_HEIGHT - 18, PLAYER_HEIGHT - 4)))
+            self.rect = self.image.get_rect(midbottom = (randint(1600, 3000), randint(PLAYER_HEIGHT * 0.53, PLAYER_HEIGHT * 0.98)))
 
     def animate(self) -> None:
         self.animation_index += 0.15
@@ -258,7 +258,7 @@ pickup_group = pygame.sprite.Group()
 
 # Timers
 obstacle_timer = pygame.USEREVENT + 1
-obstacle_timer_speed = 1700
+obstacle_timer_speed = 1850
 obstacle_timer_offset = 0
 pygame.time.set_timer(obstacle_timer, obstacle_timer_speed + obstacle_timer_offset)
 
