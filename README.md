@@ -19,11 +19,6 @@ A simple 2D endless runner built in Python.
 - Sound effects + background music
 - Game gets faster over time
 
-## 🚧 Planned
-
-- More pickups / Power-ups (e.g. shields)
-- Better difficulty scaling
-
 ## 💡 Inspiration
 
 My first game, heavily inspired by [this video](https://www.youtube.com/watch?v=AY9MnQ4x3zk).
